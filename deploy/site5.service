@@ -1,0 +1,15 @@
+[Unit]
+Description=Site5 나라장터 모니터링
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/ubuntu/나라장터사이트
+Environment=SITE5_ENABLE_SCHEDULER=true
+ExecStart=/usr/bin/python3 -m uvicorn site5.app:app --host 127.0.0.1 --port 8005
+Restart=always
+RestartSec=5
+User=ubuntu
+
+[Install]
+WantedBy=multi-user.target

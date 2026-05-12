@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Site5 나라장터 레이더</title>
+  <link rel="stylesheet" href="/site5/static/style.css">
+</head>
+<body>
+  <div class="grain"></div>
+  <header class="hero">
+    <div>
+      <p class="eyebrow">G2B Public Data Monitor</p>
+      <h1>나라장터 공고를 수집하고, 필요한 건만 디스코드로 보냅니다.</h1>
+      <p class="lede">API 수집, SQLite 저장, Google Sheets 동기화, 필터 기반 웹훅 알림을 `/site5` 한 화면에서 운영합니다.</p>
+      <form method="post" action="/site5/logout" class="logout-form">
+        <button type="submit" class="ghost">로그아웃</button>
+      </form>
+    </div>
+    <aside class="system-card">
+      <div class="status-row"><span>API 키</span><strong class="{{ 'ok' if has_api_credentials else 'bad' }}">{{ '준비됨' if has_api_credentials else '누락' }}</strong></div>
+      <div class="status-row"><span>Discord</span><strong class="{{ 'ok' if has_discord_webhook else 'bad' }}">{{ '준비됨' if has_discord_webhook else '누락' }}</strong></div>
+      <div class="status-row"><span>Spreadsheet</span><strong class="{{ 'ok' if has_google_sheet else 'bad' }}">{{ '주소 있음' if has_google_sheet else '주소 없음' }}</strong></div>
+      <div class="status-row"><span>Sheets Auth</span><strong class="{{ 'ok' if has_google_credentials else 'warn' }}">{{ '쓰기 가능' if has_google_credentials else '인증 필요' }}</strong></div>
+      <small>수집 {{ collect_interval }}초 / 시트 {{ sheet_interval }}초 주기</small>
+    </aside>
+  </header>
+
+  <main class="layout">
+    <section class="panel stats-panel">
+      <div class="panel-title">
+        <h2>운영 상태</h2>
+        <button id="refreshStatus" class="ghost">새로고침</button>
+      </div>
+      <div id="stats" class="stats-grid"></div>
+      <div class="actions">
+        <button id="runCollect">입찰공고 수집</button>
+        <button id="runNotify">디스코드 알림 검사</button>
+        <button id="runSheet">스프레드시트 동기화</button>
+      </div>
+      <div id="jobs" class="jobs"></div>
+    </section>
+
+    <section class="panel filter-panel">
+      <div class="panel-title">
+        <h2>알림 필터</h2>
+        <button id="newFilter" class="ghost">새 필터</button>
+      </div>
+      <form id="filterForm" class="filter-form">
+        <input type="hidden" name="id">
+        <label>필터명<input name="name" placeholder="예: 소프트웨어 유지보수"></label>
+        <label class="check"><input type="checkbox" name="enabled" checked> 활성화</label>
+        <label>포함 키워드<textarea name="keywords" placeholder="소프트웨어, 유지보수, 홈페이지"></textarea></label>
+        <label>제외 키워드<textarea name="exclude_keywords" placeholder="청소, 폐기물"></textarea></label>
+        <label>업무구분<input name="business_types" placeholder="용역, 물품"></label>
+        <label>지역<input name="regions" placeholder="대전, 충남"></label>
+        <label>기관<input name="institutions" placeholder="조달청, 천안시"></label>
+        <div class="two-cols">
+          <label>최소금액<input name="min_amount" type="number" min="0" step="10000"></label>
+          <label>최대금액<input name="max_amount" type="number" min="0" step="10000"></label>
+        </div>
+        <label>지역제한
+          <select name="require_region_limit">
+            <option value="any">무관</option>
+            <option value="yes">지역제한만</option>
+            <option value="no">지역제한 제외</option>
+          </select>
+        </label>
+        <div class="actions split">
+          <button type="submit">필터 저장</button>
+          <button type="button" id="deleteFilter" class="danger">삭제</button>
+        </div>
+      </form>
+      <div id="filters" class="filter-list"></div>
+    </section>
+
+    <section class="panel notices-panel">
+      <div class="panel-title">
+        <h2>입찰공고</h2>
+        <span id="noticeCount" class="chip">0건</span>
+      </div>
+      <div class="searchbar">
+        <input id="search" placeholder="공고명, 기관, 업종 검색">
+        <select id="businessType">
+          <option value="">전체 업무</option>
+          <option value="물품">물품</option>
+          <option value="용역">용역</option>
+          <option value="공사">공사</option>
+          <option value="외자">외자</option>
+        </select>
+        <input id="region" placeholder="지역">
+        <input id="minAmount" type="number" placeholder="최소금액">
+        <button id="searchButton">검색</button>
+      </div>
+      <div id="notices" class="notice-list"></div>
+      <div class="pager">
+        <button id="prevPage" class="ghost">이전</button>
+        <span id="pageInfo"></span>
+        <button id="nextPage" class="ghost">다음</button>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+  <script src="/site5/static/app.js"></script>
+</body>
+</html>

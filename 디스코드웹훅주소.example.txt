@@ -1,0 +1,5 @@
+Discord webhook URL
+https://discord.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_WEBHOOK_TOKEN
+
+Google Sheets URL
+https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit

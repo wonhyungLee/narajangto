@@ -1,0 +1,7 @@
+나라장터 공공데이터개방표준서비스 설정 예시
+
+서비스 URL
+https://apis.data.go.kr/1230000/ao/PubDataOpnStdService
+
+일반 인증키(Encoding)
+YOUR_ENCODED_SERVICE_KEY
